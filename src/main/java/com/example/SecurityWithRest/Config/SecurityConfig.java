@@ -1,6 +1,7 @@
 package com.example.SecurityWithRest.Config;
 
 import com.example.SecurityWithRest.UserService.User_Service;
+import com.example.SecurityWithRest.filter.CustomFilter;
 import com.example.SecurityWithRest.interceptor.CustomInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,26 +14,27 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 @Configuration
-public class SecurityConfig implements WebMvcConfigurer {
-    private User_Service userService;
-    public SecurityConfig(User_Service userService){
-        this.userService = userService;
+public class SecurityConfig  {
+    private final CustomFilter customFilter;
+    public SecurityConfig(CustomFilter customFilter){
+        this.customFilter = customFilter;
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception{
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/api/create","/api/login").permitAll()
-                .requestMatchers("/api/user/**").hasAnyRole("USER","ADMIN")
-                .requestMatchers("/api//update{username}/role").hasRole("ADMIN").anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults())
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID"));
+                .requestMatchers("/create","/login").permitAll()
+                .requestMatchers("/user/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers("/update{username}/role").hasRole("ADMIN").anyRequest().authenticated())
+                        .addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+                httpSecurity.addFilterBefore(new CustomFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return httpSecurity.build();
     }
     @Bean
@@ -40,7 +42,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         return config.getAuthenticationManager();
     }
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder_pass(){
         return new BCryptPasswordEncoder();
     }
 }

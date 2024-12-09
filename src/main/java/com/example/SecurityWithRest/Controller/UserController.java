@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
 public class UserController {
     @Autowired
     private User_Service userService;
 
     @PostMapping("/create")
-    public User createUser(@RequestBody User user){
-        return userService.createUser(user);
+    public ResponseEntity<String> createUser(@RequestBody User user){
+        userService.createUser(user);
+        return ResponseEntity.ok("User created Successfully");
     }
     @GetMapping("/me")
     public String getCurrentUser() {

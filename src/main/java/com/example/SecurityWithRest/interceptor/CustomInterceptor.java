@@ -25,20 +25,7 @@ public class CustomInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler)throws Exception{
-        String username = request.getHeader("X-user");
-        String password = request.getHeader("X-password");
-        if (username !=null && password !=null){
-            Optional<User> optionalUser = Optional.ofNullable(userService.FindByUserName(username));
-            if(optionalUser.isPresent()){
-                User user = optionalUser.get(); // User model
-                if (passwordEncoder.matches(password, user.getPassword())){
-                    SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user.getUsername(), null,List.of(()-> user.getRole())));
-                    return true;
-                }
-            }
-        }
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.getWriter().write("Invalid credentials");
-        return false;
+        System.out.println("Request URL:"+ request.getRequestURL());
+        return true;
     }
 }
