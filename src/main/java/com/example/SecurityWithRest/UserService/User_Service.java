@@ -19,13 +19,13 @@ public class User_Service {
     @Autowired
     private UserRepository userRepository;
 
-    public User createUser(User user){
+    public void createUser(User user){
         if (passwordEncoder_1 == null){
             throw new IllegalStateException("PasswordEncoder is not properly initialized");
         }
         String encodePassword = passwordEncoder_1.encode(user.getPassword());
         user.setPassword(encodePassword);
-        return userRepository.save(user);
+         userRepository.save(user);
     }
     public  User login(String username, String password)throws Exception{
         Optional<User> userOptional = Optional.ofNullable(userRepository.findByUsername(username));

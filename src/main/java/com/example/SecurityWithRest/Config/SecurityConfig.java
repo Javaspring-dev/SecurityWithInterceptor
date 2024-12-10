@@ -29,6 +29,7 @@ public class SecurityConfig  {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception{
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/h2-console/login.do?jsessionid=15d5e4c1f7f0427320fe14709c57c843").permitAll()
                 .requestMatchers("/create","/login").permitAll()
                 .requestMatchers("/user/**").hasAnyRole("USER","ADMIN")
                 .requestMatchers("/update{username}/role").hasRole("ADMIN").anyRequest().authenticated())
